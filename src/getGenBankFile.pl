@@ -44,19 +44,19 @@ while (my $entry = <$accNumReader>) {
 	mkdir ".\/$folderName\/$species";
 	
 	for (my $i = int($colStart)-1; $i < @row; ++$i) {
-		#print $row[$i];
-
+		my $currID = $row[$i];
+		print "$currID\n";
 
 		# 6 digits [XX000000], 8 digit [XXXX00000000], 9 digit IDs [XXXX000000000]
-		my $start = length($row[$i])-10;
-		my $accNum = substr $row[$i], $start, 8;
 
-		if ($accNum !~ /^[A-Z]/) {
-			$start = length($row[$i])-14;
-			$accNum = substr $row[$i], $start, 12;
+		my $accNum;
+
+		if ($currID  =~ m/([a-zA-Z]{2,}[0-9]{6,})/) {
+			$accNum = $1;
+		} else {
+			print "The ID doesn't match the pattern.\n\n";
+			exit;
 		}
-
-
 
 		print "$accNum\n";
 		my $accNumID = find_ID($accNum);	
@@ -66,7 +66,18 @@ while (my $entry = <$accNumReader>) {
 
 		open(my $fh, '>', $file) or die "I failed at";
 
-		print $fh $accNumID;
+		my $URLAdd = "efetch.fcgi?db=nuccore&id=" . $accNumID . "&rettype=gbwithparts&retmode=text";
+		my $URL = $URLBase . $URLAdd;
+		$URL =~ s/\s+//g;
+
+		#print $URL;
+
+		my $result = get($URL);
+
+		print $fh $result;
+
+		
+		#print $fh $accNumID;
 		#print $fh "I did it!\n";
 		close $fh;
 	} 
