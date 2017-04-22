@@ -78,6 +78,9 @@ while (my $entry = <$accNumReader>) {
 		#retrive GenBank information, print and save
 		my $result = get($FetchURL);
 		print $fh $result;
+
+		
+		
 		close $fh;
 	} 
 
