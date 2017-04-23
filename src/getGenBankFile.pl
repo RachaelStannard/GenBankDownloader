@@ -12,29 +12,30 @@ my $urlBase = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
 # MAIN ------------------------------------------------------------------------
 
 #	Welcome message
-print "######################################   _      _      _    \n";
-print "# Welcome to GenBank File Downloader # >(.)__ >(.)__ >(.)__ \n";
-print "# Enjoy!! -Rachael Stannard          #  (___/  (___/  (___/ \n";
+print "######################################    _      _      _    \n";
+print "# Welcome to GenBank File Downloader #  >(.)__ >(.)__ >(.)__ \n";
+print "# Enjoy!! -Rachael Stannard          #   (___/  (___/  (___/ \n";
 print "######################################\n\n\n";
 
 # 	Grab file name for accession numbers
 print "What file are we accessing for the accession numbers? ";
 chomp(my $accNumFile = <STDIN>);
 chomp($accNumFile);
+$accNumFile = "./Data/" . $accNumFile;
 open(my $accNumReader, "<", $accNumFile) or die "Could not open that file! I failed";
 print "$accNumFile has been found.\n\n";
 
 # 	Choose starting point for accession numbers
 print "Which column does the accNums begin? ";
 (my $colStart = <STDIN>);
-chomp($colStart = 2);
+chomp($colStart);
 print "\n";
 
 # 	Create the folder to store files
 print "Now what name would you like to name the folder? ";
 chomp(my $folderName = <STDIN>);
 print "Creating folder $folderName...\n";
-mkdir ".\/$folderName";
+mkdir ".\/Output\/$folderName";
 print "Successfully made $folderName!\n\n";
 
 # 	Loop through file, grabbing accession numbers
@@ -43,10 +44,11 @@ while (my $entry = <$accNumReader>) {
 	chomp($entry);
 	my @row = split("\t", $entry);
 	my $species = $row[0];
-	$species =~ s/(\s|\/)/_/g;
-	#$species =~ s/\//_/g;	#debugging
+	$species =~ s/\s+$//;
+	$species =~ s/(\s|\/|\\)/_/g;
+	$species =~ s/(\#|\<|\$|\%|\>|\!|\&|\*|\'|\{|\}|\?|\"|\:|\@|\||\[|\])//g;
 	print "$species\n";
-	mkdir ".\/$folderName\/$species";
+	mkdir ".\/Output\/$folderName\/$species";
 	
 	# loops through grabbing all accession numbers in current row
 	for (my $i = int($colStart)-1; $i < @row; ++$i) {
@@ -55,7 +57,7 @@ while (my $entry = <$accNumReader>) {
 
 		# differnt ID Types: 6 digits [XX000000], 8 digit [XXXX00000000], 9 digit IDs [XXXX000000000]
 		my $accNum;
-		if ($currID  =~ m/([a-zA-Z]{2,}[0-9]{6,})/) {
+		if ($currID  =~ m/([a-zA-Z]{1,}[0-9]{5,})/) {
 			$accNum = $1;
 		} else {
 			print "The ID doesn't match the pattern.\n\n";
@@ -65,7 +67,7 @@ while (my $entry = <$accNumReader>) {
 		print "$accNum\n"; 	#debugging
 		my $accNumID = search_ID($accNum);	
 		
-		my $file = ".\/$folderName\/$species\/$accNum" . ".gbk";
+		my $file = ".\/Output\/$folderName\/$species\/$accNum" . ".gbk";
 		#print "$file\n\n";	#debugging
 
 		#file to print GenBank file to
