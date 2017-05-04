@@ -83,25 +83,35 @@ while (my $entry = <$accNumReader>) {
 		print $fh $result;
 
 		open(my $tmpfileReader, "<", $tmpfile) or die "Could not open that file! I failed";
-		my $newfile = $accNum . "[ExtractedData].csv";
+		my $newfile = ".\/Output\/$folderName\/$species\/$accNum" . "[ExtractedData].csv";
 		open(my $writeNew, '>', $newfile) or die "I failed at";
 
-		print $writeNew "Name, Gene, Protein, Protein ID, Location\n";
+		print $writeNew "Name\tGene\tProtein\tProtein ID\tLocation\n";
 
 		while (my $line = <$tmpfileReader>) {
 			if ($line  =~ m/^>/) {
-				$line =~ s/\]|\>lcl\|//g;
-				$line =~ s/\[/,/g;
-				#my @line = split("\[", $line);
-				#foreach my $i (@line) {
-					print $writeNew $line;
-				#}
+				$line =~ s/\>lcl\|//g;
+				$line =~ s/\[\w+=/\t/g;
+				my @line = split("\t", $line);
+				foreach my $i (@line) {
+					chomp($i);
+					
+					print $writeNew $i . "\t";
+				}
 				print $writeNew "\n";
 			}
 		}
 
 		close $fh;
 		close $writeNew;
+
+		unlink $tmpfile;
+
+		if(-e $tmpfile) {
+    		print "File could not be removed.";
+		} else {
+    		print "File removed.";
+		}
 	} 
 
 }
