@@ -67,12 +67,15 @@ while (my $entry = <$accNumReader>) {
 		print "$accNum\n"; 	#debugging
 		my $accNumID = search_ID($accNum);	
 		
-		my $file = ".\/Output\/$folderName\/$species\/$accNum" . ".gbk";
+		#.gbk / .xml
+		my $file = ".\/Output\/$folderName\/$species\/$accNum" . ".txt";
 		#print "$file\n\n";	#debugging
 
 		#file to print GenBank file to
 		open(my $fh, '>', $file) or die "I failed at";
-		my $urlAdd = "efetch.fcgi?db=nuccore&id=" . $accNumID . "&rettype=gbwithparts&retmode=text";
+		#&rettype=gbwithparts&retmode=text
+		#
+		my $urlAdd = "efetch.fcgi?db=nuccore&id=" . $accNumID . "&rettype=fasta_cds_aa&retmode=text";
 		my $FetchURL = $urlBase . $urlAdd;
 		$FetchURL =~ s/\s+//g;
 		#print $URL;	#debugging

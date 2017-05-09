@@ -12,10 +12,10 @@ my $urlBase = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
 # MAIN ------------------------------------------------------------------------
 
 #	Welcome message
-print "   _      _      _    \n";
-print " >(.)__ >(.)__ >(.)__ \n";
-print "  (___/  (___/  (___/ \n";
-print "\n\n\n";
+print "#   _      _      _    \n";
+print "# >(.)__ >(.)__ >(.)__ \n";
+print "#  (___/  (___/  (___/ \n";
+print "#\n\n\n";
 
 # 	Grab file name for accession numbers
 print "What file are we accessing for the accession numbers? ";
@@ -83,7 +83,7 @@ while (my $entry = <$accNumReader>) {
 		print $fh $result;
 
 		open(my $tmpfileReader, "<", $tmpfile) or die "Could not open that file! I failed";
-		my $newfile = $accNum . "[ExtractedData].csv";
+		my $newfile = ".\/Output\/$folderName\/$species\/$accNum" . "[ExtractedData].csv";
 		open(my $writeNew, '>', $newfile) or die "I failed at";
 
 		print $writeNew "Name, Gene, Protein, Protein ID, Location\n";
