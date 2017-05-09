@@ -50,7 +50,12 @@ while (my $entry = <$accNumReader>) {
     my $count = 1;
     my $folderPath = $species;
 
-    while (-d (".\/Output\/$folderName\/" . $folderPath)) { #Note: find way to have the original named A
+    while (-d (".\/Output\/$folderName\/" . $folderPath . "_(A)") || 
+                      -d (".\/Output\/$folderName\/" . $folderPath)) { #Note: find way to have the original named A
+        if (-d (".\/Output\/$folderName\/" . $species)) {
+            $folderPath = $species . "_(A)";
+            rename ".\/Output\/$folderName\/" . $species, ".\/Output\/$folderName\/" . $folderPath;
+        }
         print "$species directory exists.\n";
         $folderPath = $species . "_(" . letter_numbering($count) . ")";
         if (-d (".\/Output\/$folderName\/" . $folderPath)) {
@@ -78,7 +83,7 @@ while (my $entry = <$accNumReader>) {
         print "$accNum\n";  #debugging
         my $accNumID = search_ID($accNum);  
         
-        my $tmpfile = ".\/Output\/$folderName\/$species\/$accNum" . ".tmp";
+        my $tmpfile = ".\/Output\/$folderName\/$folderPath\/$accNum" . ".tmp";
         #print "$tmpfile\n\n";  #debugging
 
         # file to print GenBank file to
@@ -94,7 +99,7 @@ while (my $entry = <$accNumReader>) {
         print $fh $result;
 
         open(my $tmpfileReader, "<", $tmpfile) or die "Could not open that file! I failed";
-        my $newfile = ".\/Output\/$folderName\/$species\/$accNum" . "[GeneLocation].csv";
+        my $newfile = ".\/Output\/$folderName\/$folderPath\/$accNum" . "[GeneLocation].csv";
         open(my $writeNew, '>', $newfile) or die "I failed at";
 
         # prep file
@@ -135,7 +140,7 @@ while (my $entry = <$accNumReader>) {
         close $fh;
         close $writeNew;
 
-        #unlink $tmpfile;
+        unlink $tmpfile;
             
         if(-e $tmpfile) {
             print "File was not removed.\n";
