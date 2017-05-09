@@ -12,10 +12,10 @@ my $urlBase = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
 # MAIN ------------------------------------------------------------------------
 
 #	Welcome message
-print "#   _      _      _    \n";
-print "# >(.)__ >(.)__ >(.)__ \n";
-print "#  (___/  (___/  (___/ \n";
-print "#\n\n\n";
+print "###   _      _      _    \n";
+print "# # >(.)__ >(.)__ >(.)__ \n";
+print "# #  (___/  (___/  (___/ \n";
+print "###\n\n\n";
 
 # 	Grab file name for accession numbers
 print "What file are we accessing for the accession numbers? ";
@@ -26,10 +26,7 @@ open(my $accNumReader, "<", $accNumFile) or die "Could not open that file! I fai
 print "$accNumFile has been found.\n\n";
 
 # 	Choose starting point for accession numbers
-print "Which column does the accNums begin? ";
-(my $colStart = <STDIN>);
-chomp($colStart);
-print "\n";
+my $colStart = 1;
 
 # 	Create the folder to store files
 print "Now what name would you like to name the folder? ";
@@ -47,8 +44,22 @@ while (my $entry = <$accNumReader>) {
 	$species =~ s/\s+$//;
 	$species =~ s/(\s|\/|\\)/_/g;
 	$species =~ s/(\#|\<|\$|\%|\>|\!|\&|\*|\'|\{|\}|\?|\"|\:|\@|\||\[|\])//g;
+
+	# checks for existing folders and create new ones if they exist	
+	my $count = 65;
+	my $folderPath = $species;
+
+	while (-d (".\/Output\/$folderName\/" . $folderPath)) {
+    	print "$species directory exists.\n";
+    	$folderPath = $species . "_(" . chr($count) . ")";
+    	if (-d (".\/Output\/$folderName\/" . $folderPath)) {
+    		$count++;
+    	}
+	}
+
 	print "$species\n";
-	mkdir ".\/Output\/$folderName\/$species";
+	mkdir ".\/Output\/$folderName\/" . $folderPath;
+	print "directory: $folderPath\n";
 	
 	# loops through grabbing all accession numbers in current row
 	for (my $i = int($colStart)-1; $i < @row; ++$i) {
@@ -91,7 +102,7 @@ while (my $entry = <$accNumReader>) {
 		while (my $line = <$tmpfileReader>) {
 			if ($line  =~ m/^>/) {
 				$line =~ s/\>lcl\|//g;
-				$line =~ s/\[\w+=/\t/g;
+				$line =~ s/ \[\w+=/\t/g;
 				my @line = split("\t", $line);
 				foreach my $i (@line) {
 					chomp($i);
@@ -108,11 +119,13 @@ while (my $entry = <$accNumReader>) {
 		unlink $tmpfile;
 
 		if(-e $tmpfile) {
-    		print "File could not be removed.";
+    		print "File could not be removed.\n";
 		} else {
-    		print "File removed.";
+    		print "File removed.\n";
 		}
-	} 
+	}
+
+	print "\n\n";
 
 }
 
@@ -131,4 +144,9 @@ sub search_ID {
 		print "\n!!!\nThere was an error and no acession number was found.\n!!!\n";
 		exit;
 	}
+}
+
+sub number_Folder {
+	$num = $_[0];
+	
 }
